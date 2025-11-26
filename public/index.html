@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Task Manager</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Team Task Manager</h1>
+        <div class="header-buttons">
+          <button id="add-member-btn" class="btn btn-secondary">
+            + Nouveau Membre
+          </button>
+          <button id="add-task-btn" class="btn btn-primary">
+            + Nouvelle Tâche
+          </button>
+        </div>
+      </header>
+
+      <div class="filters">
+        <button class="filter-btn active" data-status="all">Toutes</button>
+        <button class="filter-btn" data-status="todo">À faire</button>
+        <button class="filter-btn" data-status="in_progress">En cours</button>
+        <button class="filter-btn" data-status="done">Terminé</button>
+
+        <div class="sort-container">
+          <label for="sort-order">Tri par priorité:</label>
+          <select id="sort-order" class="sort-select">
+            <option value="desc">Haute → Basse</option>
+            <option value="asc">Basse → Haute</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="task-board">
+        <div class="column" id="todo-column">
+          <h2>À faire</h2>
+          <div class="task-list" id="todo-list"></div>
+        </div>
+        <div class="column" id="inprogress-column">
+          <h2>En cours</h2>
+          <div class="task-list" id="inprogress-list"></div>
+        </div>
+        <div class="column" id="done-column">
+          <h2>Terminé</h2>
+          <div class="task-list" id="done-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier une tâche -->
+    <div id="task-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modal-title">Nouvelle Tâche</h2>
+        <form id="task-form">
+          <input type="hidden" id="task-id" />
+          <div class="form-group">
+            <label for="title">Titre</label>
+            <input type="text" id="title" required />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="priority">Priorité</label>
+            <select id="priority">
+              <option value="Basse">Basse</option>
+              <option value="Moyenne" selected>Moyenne</option>
+              <option value="Haute">Haute</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="status">Statut</label>
+            <select id="status">
+              <option value="todo">À faire</option>
+              <option value="in_progress">En cours</option>
+              <option value="done">Terminé</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="assignedTo">Assigné à</label>
+            <select id="assignedTo">
+              <option value="">Non assigné</option>
+              <!-- Les membres seront chargés ici -->
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal pour ajouter un membre -->
+    <div id="member-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-member">&times;</span>
+        <h2>Nouveau Membre</h2>
+        <form id="member-form">
+          <div class="form-group">
+            <label for="member-name">Nom</label>
+            <input type="text" id="member-name" required />
+          </div>
+          <div class="form-group">
+            <label for="member-email">Email (optionnel)</label>
+            <input type="email" id="member-email" />
+          </div>
+          <button type="submit" class="btn btn-primary">Ajouter</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
