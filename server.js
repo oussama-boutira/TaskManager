@@ -16,6 +16,8 @@ app.use(bodyParser.json());
 // Routes
 app.use("/api/tasks", require("./routes/tasks"));
 app.use("/api/members", require("./routes/members"));
+app.use("/api/projects", require("./routes/projects"));
+app.use("/api/auth", require("./routes/auth"));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));

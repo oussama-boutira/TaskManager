@@ -1,0 +1,264 @@
+const API_URL = "http://localhost:3000/api";
+
+// State
+let members = [];
+let projects = [];
+let currentProject = null;
+
+// DOM Elements
+const membersTableBody = document.getElementById("members-table-body");
+const addMemberBtn = document.getElementById("add-member-btn");
+const memberModal = document.getElementById("member-modal");
+const memberForm = document.getElementById("member-form");
+const closeBtn = document.querySelector(".close");
+const projectsList = document.getElementById("projects-list");
+const addProjectBtn = document.getElementById("add-project-btn");
+const projectModal = document.getElementById("project-modal");
+const projectForm = document.getElementById("project-form");
+const closeProjectBtn = document.querySelector(".close-project");
+const sidebarToggle = document.getElementById("sidebar-toggle");
+const sidebar = document.getElementById("sidebar");
+
+// Initialize
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchProjects();
+  await fetchMembers();
+  setupEventListeners();
+});
+
+// Event Listeners
+function setupEventListeners() {
+  addMemberBtn.addEventListener("click", () => openMemberModal());
+  closeBtn.addEventListener("click", () => closeMemberModal());
+  window.addEventListener("click", (e) => {
+    if (e.target === memberModal) closeMemberModal();
+  });
+
+  memberForm.addEventListener("submit", handleMemberFormSubmit);
+
+  addProjectBtn.addEventListener("click", () => openProjectModal());
+  closeProjectBtn.addEventListener("click", () => closeProjectModal());
+  window.addEventListener("click", (e) => {
+    if (e.target === projectModal) closeProjectModal();
+  });
+  projectForm.addEventListener("submit", handleProjectFormSubmit);
+
+  sidebarToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+  });
+}
+
+// API Calls - Members
+async function fetchMembers() {
+  try {
+    const res = await fetch(`${API_URL}/members`);
+    members = await res.json();
+    renderMembersTable();
+  } catch (err) {
+    console.error("Error fetching members:", err);
+  }
+}
+
+async function createMember(member) {
+  try {
+    const res = await fetch(`${API_URL}/members`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(member),
+    });
+    const newMember = await res.json();
+    members.push(newMember);
+    renderMembersTable();
+    closeMemberModal();
+    alert(`Membre "${newMember.name}" ajouté avec succès!`);
+  } catch (err) {
+    console.error("Error creating member:", err);
+    alert("Erreur lors de l'ajout du membre.");
+  }
+}
+
+async function updateMember(id, updates) {
+  try {
+    const res = await fetch(`${API_URL}/members/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    const updatedMember = await res.json();
+    const index = members.findIndex((m) => m._id === id);
+    if (index !== -1) {
+      members[index] = updatedMember;
+      renderMembersTable();
+    }
+    closeMemberModal();
+  } catch (err) {
+    console.error("Error updating member:", err);
+    alert("Erreur lors de la mise à jour du membre.");
+  }
+}
+
+async function deleteMember(id) {
+  if (!confirm("Êtes-vous sûr de vouloir supprimer ce membre ?")) return;
+
+  try {
+    await fetch(`${API_URL}/members/${id}`, { method: "DELETE" });
+    members = members.filter((m) => m._id !== id);
+    renderMembersTable();
+    alert("Membre supprimé avec succès!");
+  } catch (err) {
+    console.error("Error deleting member:", err);
+    alert("Erreur lors de la suppression du membre.");
+  }
+}
+
+// UI Functions - Members
+function renderMembersTable() {
+  membersTableBody.innerHTML = "";
+
+  if (members.length === 0) {
+    membersTableBody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+          Aucun membre trouvé. Cliquez sur "+ Nouveau Membre" pour en ajouter un.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  members.forEach((member) => {
+    const tr = document.createElement("tr");
+    const createdDate = new Date(member.createdAt).toLocaleDateString("fr-FR");
+
+    tr.innerHTML = `
+      <td><strong>${member.name}</strong></td>
+      <td>${
+        member.email ||
+        '<em style="color: var(--text-secondary);">Pas d\'email</em>'
+      }</td>
+      <td>${createdDate}</td>
+      <td>
+        <div class="table-actions">
+          <button class="btn btn-primary" onclick="openMemberModal('${
+            member._id
+          }')">Éditer</button>
+          <button class="btn btn-danger" onclick="deleteMember('${
+            member._id
+          }')">Supprimer</button>
+        </div>
+      </td>
+    `;
+
+    membersTableBody.appendChild(tr);
+  });
+}
+
+function openMemberModal(memberId = null) {
+  memberModal.style.display = "block";
+  const title = document.getElementById("member-modal-title");
+
+  if (memberId) {
+    const member = members.find((m) => m._id === memberId);
+    if (member) {
+      title.textContent = "Modifier le Membre";
+      document.getElementById("member-id").value = member._id;
+      document.getElementById("member-name").value = member.name;
+      document.getElementById("member-email").value = member.email || "";
+    }
+  } else {
+    title.textContent = "Nouveau Membre";
+    memberForm.reset();
+    document.getElementById("member-id").value = "";
+  }
+}
+
+function closeMemberModal() {
+  memberModal.style.display = "none";
+}
+
+function handleMemberFormSubmit(e) {
+  e.preventDefault();
+
+  const memberData = {
+    name: document.getElementById("member-name").value,
+    email: document.getElementById("member-email").value || undefined,
+  };
+
+  const id = document.getElementById("member-id").value;
+
+  if (id) {
+    updateMember(id, memberData);
+  } else {
+    createMember(memberData);
+  }
+}
+
+// Project Management Functions (for sidebar)
+async function fetchProjects() {
+  try {
+    const res = await fetch(`${API_URL}/projects`);
+    projects = await res.json();
+    renderProjects();
+  } catch (err) {
+    console.error("Error fetching projects:", err);
+  }
+}
+
+async function createProject(project) {
+  try {
+    const res = await fetch(`${API_URL}/projects`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(project),
+    });
+    const newProject = await res.json();
+    projects.push(newProject);
+    renderProjects();
+    closeProjectModal();
+  } catch (err) {
+    console.error("Error creating project:", err);
+  }
+}
+
+function renderProjects() {
+  projectsList.innerHTML = "";
+
+  projects.forEach((project) => {
+    const div = document.createElement("div");
+    div.className = "project-item";
+
+    div.innerHTML = `
+      <div class="project-color" style="background-color: ${project.color}"></div>
+      <span class="project-name">${project.name}</span>
+    `;
+
+    div.onclick = () => {
+      window.location.href = "index.html";
+    };
+
+    projectsList.appendChild(div);
+  });
+}
+
+function openProjectModal() {
+  projectModal.style.display = "block";
+  projectForm.reset();
+  document.getElementById("project-id").value = "";
+  document.getElementById("project-color").value = "#4f46e5";
+}
+
+function closeProjectModal() {
+  projectModal.style.display = "none";
+}
+
+function handleProjectFormSubmit(e) {
+  e.preventDefault();
+
+  const projectData = {
+    name: document.getElementById("project-name").value,
+    description: document.getElementById("project-description").value,
+    color: document.getElementById("project-color").value,
+  };
+
+  createProject(projectData);
+}

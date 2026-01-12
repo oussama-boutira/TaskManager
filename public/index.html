@@ -9,53 +9,226 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   </head>
   <body>
-    <div class="container">
-      <header>
-        <h1>Team Task Manager</h1>
-        <div class="header-buttons">
-          <button id="add-member-btn" class="btn btn-secondary">
-            + Nouveau Membre
-          </button>
-          <button id="add-task-btn" class="btn btn-primary">
-            + Nouvelle Tâche
-          </button>
-        </div>
-      </header>
+    <!-- Sidebar for Projects -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>Projets</h2>
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      </div>
+      <div class="projects-list" id="projects-list">
+        <!-- Projects will be loaded here -->
+      </div>
+      <button class="btn btn-primary" id="add-project-btn">
+        + Nouveau Projet
+      </button>
 
-      <div class="filters">
-        <button class="filter-btn active" data-status="all">Toutes</button>
-        <button class="filter-btn" data-status="todo">À faire</button>
-        <button class="filter-btn" data-status="in_progress">En cours</button>
-        <button class="filter-btn" data-status="done">Terminé</button>
+      <div class="sidebar-divider"></div>
 
-        <div class="sort-container">
-          <label for="sort-order">Tri par priorité:</label>
-          <select id="sort-order" class="sort-select">
-            <option value="desc">Haute → Basse</option>
-            <option value="asc">Basse → Haute</option>
-          </select>
+      <button
+        class="btn sidebar-link"
+        data-page="dashboard"
+        id="nav-dashboard"
+        style="display: none"
+      >
+        Tableau de Bord
+      </button>
+      <button
+        class="btn sidebar-link"
+        data-page="members"
+        id="nav-members"
+        style="display: none"
+      >
+        Gestion des Membres
+      </button>
+      <button
+        class="btn sidebar-link danger"
+        id="logout-btn"
+        style="display: none; margin-top: auto"
+      >
+        Déconnexion
+      </button>
+    </div>
+
+    <div class="main-content">
+      <!-- Login Page -->
+      <div id="login-page" class="page active">
+        <div class="login-container">
+          <div class="login-card">
+            <h2>Connexion</h2>
+            <form id="login-form">
+              <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required />
+              </div>
+              <div class="form-group">
+                <label for="login-password">Mot de passe</label>
+                <input type="password" id="login-password" required />
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%">
+                Se connecter
+              </button>
+            </form>
+            <p style="margin-top: 1rem; text-align: center">
+              Pas encore de compte ?
+              <a href="#" id="show-register">S'inscrire</a>
+            </p>
+          </div>
         </div>
       </div>
 
-      <div class="task-board">
-        <div class="column" id="todo-column">
-          <h2>À faire</h2>
-          <div class="task-list" id="todo-list"></div>
+      <!-- Register Page -->
+      <div id="register-page" class="page">
+        <div class="login-container">
+          <div class="login-card">
+            <h2>Inscription</h2>
+            <form id="register-form">
+              <div class="form-group">
+                <label for="register-name">Nom</label>
+                <input type="text" id="register-name" required />
+              </div>
+              <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" required />
+              </div>
+              <div class="form-group">
+                <label for="register-password">Mot de passe</label>
+                <input type="password" id="register-password" required />
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%">
+                S'inscrire
+              </button>
+            </form>
+            <p style="margin-top: 1rem; text-align: center">
+              Déjà un compte ? <a href="#" id="show-login">Se connecter</a>
+            </p>
+          </div>
         </div>
-        <div class="column" id="inprogress-column">
-          <h2>En cours</h2>
-          <div class="task-list" id="inprogress-list"></div>
+      </div>
+
+      <!-- Dashboard Page -->
+      <div id="dashboard-page" class="page">
+        <div class="container">
+          <header>
+            <h1>Team Task Manager</h1>
+            <div class="header-buttons">
+              <button id="add-member-btn" class="btn btn-secondary">
+                + Nouveau Membre
+              </button>
+              <button id="add-task-btn" class="btn btn-primary">
+                + Nouvelle Tâche
+              </button>
+            </div>
+          </header>
+
+          <!-- Dashboard Section -->
+          <div class="dashboard">
+            <h2 class="dashboard-title">Tableau de Bord</h2>
+            <div class="stats-cards">
+              <div class="stat-card">
+                <h3>Total Tâches</h3>
+                <p class="stat-number" id="total-tasks">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>À faire</h3>
+                <p class="stat-number" id="todo-count">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>En cours</h3>
+                <p class="stat-number" id="inprogress-count">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>Terminé</h3>
+                <p class="stat-number" id="done-count">0</p>
+              </div>
+            </div>
+
+            <div class="charts-container">
+              <div class="chart-box">
+                <h3>Répartition par Statut</h3>
+                <canvas id="statusChart"></canvas>
+              </div>
+              <div class="chart-box">
+                <h3>Répartition par Priorité</h3>
+                <canvas id="priorityChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="filters">
+            <button class="filter-btn active" data-status="all">Toutes</button>
+            <button class="filter-btn" data-status="todo">À faire</button>
+            <button class="filter-btn" data-status="in_progress">
+              En cours
+            </button>
+            <button class="filter-btn" data-status="done">Terminé</button>
+
+            <div class="sort-container">
+              <label for="sort-order">Tri par priorité:</label>
+              <select id="sort-order" class="sort-select">
+                <option value="desc">Haute → Basse</option>
+                <option value="asc">Basse → Haute</option>
+              </select>
+            </div>
+
+            <div class="sort-container">
+              <label for="member-filter">Filtrer par membre:</label>
+              <select id="member-filter" class="sort-select">
+                <option value="all">Tous les membres</option>
+                <!-- Les membres seront chargés ici -->
+              </select>
+            </div>
+          </div>
+
+          <div class="task-board">
+            <div class="column" id="todo-column">
+              <h2>À faire</h2>
+              <div class="task-list" id="todo-list"></div>
+            </div>
+            <div class="column" id="inprogress-column">
+              <h2>En cours</h2>
+              <div class="task-list" id="inprogress-list"></div>
+            </div>
+            <div class="column" id="done-column">
+              <h2>Terminé</h2>
+              <div class="task-list" id="done-list"></div>
+            </div>
+          </div>
         </div>
-        <div class="column" id="done-column">
-          <h2>Terminé</h2>
-          <div class="task-list" id="done-list"></div>
+      </div>
+
+      <!-- Members Page -->
+      <div id="members-page" class="page">
+        <div class="container">
+          <header>
+            <h1>Gestion des Membres</h1>
+            <button id="add-member-btn-page" class="btn btn-primary">
+              + Nouveau Membre
+            </button>
+          </header>
+
+          <div class="members-table-container">
+            <table class="members-table">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Email</th>
+                  <th>Date de création</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="members-table-body">
+                <!-- Members will be loaded here -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal pour ajouter/modifier une tâche -->
+    <!-- Modals -->
     <div id="task-modal" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
@@ -87,23 +260,29 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="assignedTo">Assigné à</label>
             <select id="assignedTo">
               <option value="">Non assigné</option>
-              <!-- Les membres seront chargés ici -->
             </select>
+          </div>
+          <div class="form-group">
+            <label for="startDate">Date de début</label>
+            <input type="date" id="startDate" />
+          </div>
+          <div class="form-group">
+            <label for="dueDate">Date de fin</label>
+            <input type="date" id="dueDate" />
           </div>
           <button type="submit" class="btn btn-primary">Enregistrer</button>
         </form>
       </div>
     </div>
 
-    <!-- Modal pour ajouter un membre -->
     <div id="member-modal" class="modal">
       <div class="modal-content">
         <span class="close-member">&times;</span>
-        <h2>Nouveau Membre</h2>
+        <h2 id="member-modal-title">Nouveau Membre</h2>
         <form id="member-form">
+          <input type="hidden" id="member-id" />
           <div class="form-group">
             <label for="member-name">Nom</label>
             <input type="text" id="member-name" required />
@@ -112,11 +291,34 @@
             <label for="member-email">Email (optionnel)</label>
             <input type="email" id="member-email" />
           </div>
-          <button type="submit" class="btn btn-primary">Ajouter</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
         </form>
       </div>
     </div>
 
-    <script src="app.js"></script>
+    <div id="project-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-project">&times;</span>
+        <h2 id="project-modal-title">Nouveau Projet</h2>
+        <form id="project-form">
+          <input type="hidden" id="project-id" />
+          <div class="form-group">
+            <label for="project-name">Nom du projet</label>
+            <input type="text" id="project-name" required />
+          </div>
+          <div class="form-group">
+            <label for="project-description">Description (optionnel)</label>
+            <textarea id="project-description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="project-color">Couleur</label>
+            <input type="color" id="project-color" value="#4f46e5" />
+          </div>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="spa.js"></script>
   </body>
 </html>

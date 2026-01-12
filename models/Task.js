@@ -24,11 +24,22 @@ const taskSchema = new mongoose.Schema(
       ref: "Member",
       required: false,
     },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: false, // Will be required after migration
+    },
     tags: [
       {
         type: String,
       },
     ],
+    startDate: {
+      type: Date,
+    },
+    dueDate: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

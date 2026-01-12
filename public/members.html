@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion des Membres - Team Task Manager</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Sidebar for Projects -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>Projets</h2>
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      </div>
+      <div class="projects-list" id="projects-list">
+        <!-- Projects will be loaded here -->
+      </div>
+      <button class="btn btn-primary" id="add-project-btn">
+        + Nouveau Projet
+      </button>
+
+      <div class="sidebar-divider"></div>
+
+      <a href="index.html" class="btn btn-secondary sidebar-link">
+        📊 Tableau de Bord
+      </a>
+      <button class="btn btn-secondary sidebar-link active">
+        👥 Gestion des Membres
+      </button>
+    </div>
+
+    <div class="main-content">
+      <div class="container">
+        <header>
+          <h1>Gestion des Membres</h1>
+          <button id="add-member-btn" class="btn btn-primary">
+            + Nouveau Membre
+          </button>
+        </header>
+
+        <div class="members-table-container">
+          <table class="members-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="members-table-body">
+              <!-- Members will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour ajouter/éditer un membre -->
+    <div id="member-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="member-modal-title">Nouveau Membre</h2>
+        <form id="member-form">
+          <input type="hidden" id="member-id" />
+          <div class="form-group">
+            <label for="member-name">Nom</label>
+            <input type="text" id="member-name" required />
+          </div>
+          <div class="form-group">
+            <label for="member-email">Email (optionnel)</label>
+            <input type="email" id="member-email" />
+          </div>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal pour ajouter/éditer un projet -->
+    <div id="project-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-project">&times;</span>
+        <h2 id="project-modal-title">Nouveau Projet</h2>
+        <form id="project-form">
+          <input type="hidden" id="project-id" />
+          <div class="form-group">
+            <label for="project-name">Nom du projet</label>
+            <input type="text" id="project-name" required />
+          </div>
+          <div class="form-group">
+            <label for="project-description">Description (optionnel)</label>
+            <textarea id="project-description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="project-color">Couleur</label>
+            <input type="color" id="project-color" value="#4f46e5" />
+          </div>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="members.js"></script>
+  </body>
+</html>

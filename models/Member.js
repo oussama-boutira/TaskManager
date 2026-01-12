@@ -12,6 +12,15 @@ const memberSchema = new mongoose.Schema(
       unique: true,
       sparse: true, // Allows multiple null values
     },
+    password: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
   },
   {
     timestamps: true,
